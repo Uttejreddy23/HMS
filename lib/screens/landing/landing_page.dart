@@ -1,8 +1,8 @@
 // landing_page.dart
 import 'package:flutter/material.dart';
 import '../auth/login_patient.dart';
-import '../auth/login_doctor.dart';
-import '../auth/login_admin.dart';
+import 'package:hms/screens/auth/login_doctor.dart';
+import 'package:hms/screens/auth/login_admin.dart';
 
 class LandingPage extends StatelessWidget {
   const LandingPage({super.key});
@@ -18,18 +18,22 @@ class LandingPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Welcome to SmartKare', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            const Text('Welcome to SmartKare',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 40),
             ElevatedButton(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PatientLoginPage())),
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const PatientLoginPage())),
               child: const Text('Patient Login'),
             ),
             ElevatedButton(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DoctorLoginPage())),
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => DoctorLoginPage())),
               child: const Text('Doctor Login'),
             ),
             ElevatedButton(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminLoginPage())),
+              onPressed: () => Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => AdminLoginPage())),
               child: const Text('Admin Login'),
             ),
           ],

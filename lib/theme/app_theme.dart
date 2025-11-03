@@ -6,6 +6,6 @@ class AppTheme {
     brightness: Brightness.light,
     colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
     useMaterial3: true,
-    cardTheme: const CardTheme(), // ✅ Fixed type issue
+    cardTheme: const CardThemeData(), // ✅ Fixed type issue
   );
 }
