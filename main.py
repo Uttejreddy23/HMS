@@ -11,6 +11,33 @@ from passlib.context import CryptContext
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title='hospital management')
+from fastapi import FastAPI
+
+app = FastAPI(
+    title="🏥 Hospital Management System",
+    description="""
+A modern **Hospital Management API**.
+
+🔹 Manage Patients  
+🔹 Register Doctors  
+🔹 Secure Login/Signup with Argon2  
+🔹 JSON-based RESTful Endpoints
+
+_Developed by OG_
+    """,
+    version="2.0.1",
+    terms_of_service="https://hospital.example.com/terms/",
+    contact={
+        "name": "Uttej Reddy",
+        "url": "https://github.com/Uttejreddy23",
+        "email": "reddyuttej4@gmail.com",
+    },
+    
+    
+    docs_url="/docs",     # Swagger UI (you can rename path)
+    redoc_url="/documentation" # ReDoc alternative UI
+)
+
 
 # Password hashing
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
@@ -39,6 +66,7 @@ class LoginSchema(BaseModel):
 @app.get('/',status_code=201)
 def main_page():
     return {"message":"WELCOME COME TO FASTAPI/HOSPITAL MANAGEMENT SYSTEM"}
+    return get_db
 # Signup endpoint
 @app.post("/signup")
 def signup(user: SignupSchema, db: Session = Depends(get_db)):

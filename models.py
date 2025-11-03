@@ -1,6 +1,6 @@
 # models.py
 import uuid
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String,Integer
 from database import Base
 
 class UsersSignup(Base):
@@ -11,7 +11,7 @@ class UsersSignup(Base):
     last_name = Column(String, nullable=True)
     gmail = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
-    contacts = Column(String, nullable=True)
+    contacts = Column(Integer, nullable=True)
 
 
 class UsersLogin(Base):

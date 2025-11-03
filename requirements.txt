@@ -10,7 +10,7 @@ mysql-connector-python
 
 python-jose
 
-passlib[bcrypt]
+passlib[argon2]
 
 alembic
 
