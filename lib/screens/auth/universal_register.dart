@@ -1,4 +1,5 @@
-// lib/screens/auth/universal_register.dart
+
+
 import 'package:flutter/material.dart';
 import 'universal_login.dart';
 
@@ -11,13 +12,18 @@ class UniversalRegisterPage extends StatefulWidget {
 
 class _UniversalRegisterPageState extends State<UniversalRegisterPage> {
   final _formKey = GlobalKey<FormState>();
+
+  // Controllers
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-  final contactController = TextEditingController();
-  String selectedRole = 'Patient';
+  final genderController = TextEditingController();
+  final ageController = TextEditingController();
+  final bloodGroupController = TextEditingController();
+  final cityController = TextEditingController();
+  final countryController = TextEditingController();
 
   bool isLoading = false;
   bool obscurePassword = true;
@@ -32,11 +38,8 @@ class _UniversalRegisterPageState extends State<UniversalRegisterPage> {
       setState(() => isLoading = false);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "$selectedRole registered successfully!",
-            style: const TextStyle(color: Colors.white),
-          ),
+        const SnackBar(
+          content: Text("Patient registered successfully!"),
           backgroundColor: Colors.green,
         ),
       );
@@ -53,7 +56,7 @@ class _UniversalRegisterPageState extends State<UniversalRegisterPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
-        title: const Text("SmartKare - Registration"),
+        title: const Text("SmartKare - Patient Registration"),
         backgroundColor: Colors.blueAccent,
         centerTitle: true,
       ),
@@ -79,8 +82,9 @@ class _UniversalRegisterPageState extends State<UniversalRegisterPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // 🏥 Title
                   const Text(
-                    "Create Account 🏥",
+                    "Create Patient Account 🏥",
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
@@ -88,169 +92,92 @@ class _UniversalRegisterPageState extends State<UniversalRegisterPage> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    "Register as Patient, Doctor or Admin",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                  const SizedBox(height: 32),
-
-                  // Role selection
-                  DropdownButtonFormField<String>(
-                    value: selectedRole,
-                    decoration: InputDecoration(
-                      labelText: "Select Role",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    items: const [
-                      DropdownMenuItem(
-                          value: 'Patient', child: Text('Patient')),
-                      DropdownMenuItem(value: 'Doctor', child: Text('Doctor')),
-                      DropdownMenuItem(value: 'Admin', child: Text('Admin')),
-                    ],
-                    onChanged: (value) {
-                      setState(() => selectedRole = value!);
-                    },
-                  ),
-                  const SizedBox(height: 20),
-
-                  // First name
-                  TextFormField(
-                    controller: firstNameController,
-                    decoration: InputDecoration(
-                      labelText: "First Name",
-                      prefixIcon: const Icon(Icons.person_outline),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    validator: (value) =>
-                        value!.isEmpty ? "Please enter first name" : null,
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Last name
-                  TextFormField(
-                    controller: lastNameController,
-                    decoration: InputDecoration(
-                      labelText: "Last Name",
-                      prefixIcon: const Icon(Icons.person_outline),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    validator: (value) =>
-                        value!.isEmpty ? "Please enter last name" : null,
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Email
-                  TextFormField(
-                    controller: emailController,
-                    decoration: InputDecoration(
-                      labelText: "Email",
-                      prefixIcon: const Icon(Icons.email_outlined),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value!.isEmpty) return "Please enter email";
-                      if (!value.contains("@")) return "Invalid email format";
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Password
-                  TextFormField(
-                    controller: passwordController,
-                    obscureText: obscurePassword,
-                    decoration: InputDecoration(
-                      labelText: "Password",
-                      prefixIcon: const Icon(Icons.lock_outline),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          obscurePassword
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                        ),
-                        onPressed: () {
-                          setState(() => obscurePassword = !obscurePassword);
-                        },
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value!.isEmpty) return "Please enter password";
-                      if (value.length < 6) {
-                        return "Password must be at least 6 characters";
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Confirm password
-                  TextFormField(
-                    controller: confirmPasswordController,
-                    obscureText: obscureConfirmPassword,
-                    decoration: InputDecoration(
-                      labelText: "Confirm Password",
-                      prefixIcon: const Icon(Icons.lock_outline),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          obscureConfirmPassword
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                        ),
-                        onPressed: () {
-                          setState(() =>
-                              obscureConfirmPassword = !obscureConfirmPassword);
-                        },
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value!.isEmpty) return "Please confirm password";
-                      if (value != passwordController.text) {
-                        return "Passwords do not match";
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Contact number
-                  TextFormField(
-                    controller: contactController,
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(
-                      labelText: "Contact Number",
-                      prefixIcon: const Icon(Icons.phone),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value!.isEmpty) return "Please enter contact number";
-                      if (value.length != 10) {
-                        return "Enter a valid 10-digit number";
-                      }
-                      return null;
-                    },
-                  ),
                   const SizedBox(height: 30),
 
-                  // Register button
+                  // First name
+                  _buildTextField(firstNameController, "First Name",
+                      Icons.person_outline, false),
+                  const SizedBox(height: 15),
+
+                  // Last name
+                  _buildTextField(lastNameController, "Last Name",
+                      Icons.person_outline, false),
+                  const SizedBox(height: 15),
+
+                  // Email
+                  _buildTextField(
+                      emailController, "Email", Icons.email_outlined, false,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                    if (value!.isEmpty) return "Please enter email";
+                    if (!value.contains("@")) return "Invalid email format";
+                    return null;
+                  }),
+                  const SizedBox(height: 15),
+
+                  // Password
+                  _buildPasswordField(passwordController, "Password",
+                      obscurePassword, () {
+                    setState(() => obscurePassword = !obscurePassword);
+                  }),
+                  const SizedBox(height: 15),
+
+                  // Confirm Password
+                  _buildPasswordField(confirmPasswordController,
+                      "Confirm Password", obscureConfirmPassword, () {
+                    setState(() =>
+                        obscureConfirmPassword = !obscureConfirmPassword);
+                  }),
+                  const SizedBox(height: 15),
+
+                  // Gender
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: "Gender",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      prefixIcon: const Icon(Icons.wc),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: "Male", child: Text("Male")),
+                      DropdownMenuItem(value: "Female", child: Text("Female")),
+                      DropdownMenuItem(value: "Other", child: Text("Other")),
+                    ],
+                    onChanged: (value) {
+                      genderController.text = value!;
+                    },
+                    validator: (value) =>
+                        value == null ? "Please select gender" : null,
+                  ),
+                  const SizedBox(height: 15),
+
+                  // Age
+                  _buildTextField(
+                    ageController,
+                    "Age",
+                    Icons.cake,
+                    false,
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 15),
+
+                  // Blood Group
+                  _buildTextField(
+                      bloodGroupController, "Blood Group", Icons.bloodtype, false),
+                  const SizedBox(height: 15),
+
+                  // City
+                  _buildTextField(
+                      cityController, "City", Icons.location_city, false),
+                  const SizedBox(height: 15),
+
+                  // Country
+                  _buildTextField(
+                      countryController, "Country", Icons.flag, false),
+                  const SizedBox(height: 25),
+
+                  // Register Button
                   isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : ElevatedButton(
@@ -264,10 +191,7 @@ class _UniversalRegisterPageState extends State<UniversalRegisterPage> {
                           ),
                           child: const Text(
                             "Register",
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                            ),
+                            style: TextStyle(fontSize: 18, color: Colors.white),
                           ),
                         ),
                   const SizedBox(height: 20),
@@ -299,6 +223,58 @@ class _UniversalRegisterPageState extends State<UniversalRegisterPage> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  // ------------------------------
+  // 🔹 Helper Widgets
+  // ------------------------------
+  Widget _buildTextField(TextEditingController controller, String label,
+      IconData icon, bool obscure,
+      {TextInputType keyboardType = TextInputType.text,
+      String? Function(String?)? validator}) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscure,
+      keyboardType: keyboardType,
+      validator: validator ?? (value) => value!.isEmpty ? "Enter $label" : null,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField(TextEditingController controller, String label,
+      bool obscure, VoidCallback onToggle) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscure,
+      validator: (value) {
+        if (value!.isEmpty) return "Please enter $label";
+        if (label == "Confirm Password" &&
+            value != passwordController.text) {
+          return "Passwords do not match";
+        }
+        if (value.length < 6) {
+          return "Password must be at least 6 characters";
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: const Icon(Icons.lock_outline),
+        suffixIcon: IconButton(
+          icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
+          onPressed: onToggle,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
     );

@@ -165,7 +165,7 @@ class _UniversalLoginPageState extends State<UniversalLoginPage> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const UniversalRegisterPage()),
+                              builder: (_) =>  UniversalRegisterPage()),
                         );
                       },
                       child: const Text(
