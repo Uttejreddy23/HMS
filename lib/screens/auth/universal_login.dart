@@ -58,7 +58,7 @@ class _UniversalLoginPageState extends State<UniversalLoginPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
-        title: const Text("SmartKare - Universal Login"),
+        title: const Text("SmartKare - Login"),
         backgroundColor: Colors.blueAccent,
         centerTitle: true,
       ),
