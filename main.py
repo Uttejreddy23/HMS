@@ -1,18 +1,14 @@
-# main.py
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
-
-import models
-from pydantic import BaseModel
 from passlib.context import CryptContext
+from pydantic import BaseModel
+import models
 
 # Create tables
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title='hospital management')
-from fastapi import FastAPI
-
+# App info
 app = FastAPI(
     title="🏥 Hospital Management System",
     description="""
@@ -24,25 +20,21 @@ A modern **Hospital Management API**.
 🔹 JSON-based RESTful Endpoints
 
 _Developed by OG_
-    """,
+""",
     version="2.0.1",
-    terms_of_service="https://hospital.example.com/terms/",
     contact={
         "name": "Uttej Reddy",
         "url": "https://github.com/Uttejreddy23",
         "email": "reddyuttej4@gmail.com",
     },
-    
-    
-    docs_url="/docs",     # Swagger UI (you can rename path)
-    redoc_url="/documentation" # ReDoc alternative UI
+    docs_url="/docs",
+    redoc_url="/documentation"
 )
 
-
-# Password hashing
+# Password hasher
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
-# Dependency to get DB session
+# Dependency for DB session
 def get_db():
     db = SessionLocal()
     try:
@@ -63,19 +55,19 @@ class LoginSchema(BaseModel):
     password: str
 
 
-@app.get('/',status_code=201)
+@app.get("/", status_code=200)
 def main_page():
-    return {"message":"WELCOME COME TO FASTAPI/HOSPITAL MANAGEMENT SYSTEM"}
-    return get_db
-# Signup endpoint
+    return {"message": "WELCOME TO FASTAPI/HOSPITAL MANAGEMENT SYSTEM"}
+
+# ✅ Signup
 @app.post("/signup")
 def signup(user: SignupSchema, db: Session = Depends(get_db)):
-    existing_user = db.query(models.UsersSignup).filter(models.UsersSignup.gmail == user.gmail).first()
+    existing_user = db.query(models.Users).filter(models.Users.gmail == user.gmail).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="User already exists")
 
     hashed_pw = pwd_context.hash(user.password)
-    new_user = models.UsersSignup(
+    new_user = models.Users(
         first_name=user.first_name,
         last_name=user.last_name,
         gmail=user.gmail,
@@ -85,13 +77,12 @@ def signup(user: SignupSchema, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-
     return {"message": "Signup successful", "user_id": new_user.id}
 
-# Signin endpoint
+# ✅ Signin
 @app.post("/signin")
 def signin(user: LoginSchema, db: Session = Depends(get_db)):
-    db_user = db.query(models.UsersSignup).filter(models.UsersSignup.gmail == user.gmail).first()
+    db_user = db.query(models.Users).filter(models.Users.gmail == user.gmail).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
 

@@ -1,22 +1,14 @@
-# models.py
 import uuid
 from sqlalchemy import Column, String,Integer
 from database import Base
 
-class UsersSignup(Base):
-    __tablename__ = "patient_signup"
+class Users(Base):
+    __tablename__ = "patient_users"
 
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=True)
     gmail = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
-    contacts = Column(Integer, nullable=True)
-
-
-class UsersLogin(Base):
-    __tablename__ = "patients_login"
-
-    gmail = Column(String, nullable=False, primary_key=True)
-    password = Column(String, nullable=False)
-
+    contacts = Column(String, nullable=True, unique=True)
