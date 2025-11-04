@@ -226,7 +226,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                                       await Future.delayed(
                                           const Duration(seconds: 2));
 
-                                      if (mounted) {
+                                      if (!mounted) {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(const SnackBar(
                                           content: Text(

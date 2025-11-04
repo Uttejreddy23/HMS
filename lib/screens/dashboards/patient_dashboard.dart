@@ -165,7 +165,7 @@ class _QuickActions extends StatelessWidget {
             duration: const Duration(milliseconds: 300),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: (action["color"] as Color).withOpacity(0.1),
+              color: (action["color"] as Color).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(15),
               border: Border.all(color: action["color"] as Color, width: 1),
             ),
@@ -221,8 +221,8 @@ class _HealthOverview extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 gradient: LinearGradient(
                   colors: [
-                    Colors.blueAccent.withOpacity(0.7),
-                    Colors.lightBlueAccent.withOpacity(0.7)
+                    Colors.blueAccent.withValues(alpha: 0.7),
+                    Colors.lightBlueAccent.withValues(alpha: 0.7)
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,

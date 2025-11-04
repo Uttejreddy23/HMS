@@ -477,7 +477,7 @@ class _NavLink extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: hovered ? Colors.white.withOpacity(0.08) : Colors.transparent,
+          color: hovered ? Colors.white.withValues(alpha: 0.08) : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
