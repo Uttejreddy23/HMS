@@ -1,4 +1,10 @@
+// lib/screens/landing/landing_page.dart
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
+
 import '../auth/universal_login.dart';
 import '../auth/universal_register.dart';
 import '../appointments/appointment_page.dart';
@@ -11,14 +17,42 @@ class LandingPage extends StatefulWidget {
 }
 
 class _LandingPageState extends State<LandingPage> {
+  // Scroll notifier for section animations
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<double> _scrollNotifier = ValueNotifier(0);
+
+  // Feature row auto-scroll
+  final ScrollController _featureScrollController = ScrollController();
+  Timer? _featureAutoScrollTimer;
+
+  // Testimonials page controller & auto-slide
+  final PageController _testiPageController =
+      PageController(viewportFraction: 0.5);
+  Timer? _testiAutoSlideTimer;
 
   @override
   void initState() {
     super.initState();
+
+    // listen for scrollOffset to drive AnimatedSection visibility
     _scrollController.addListener(() {
       _scrollNotifier.value = _scrollController.offset;
+    });
+
+    // Start auto-scrolling features horizontally every 0.5s
+    _featureAutoScrollTimer = Timer.periodic(
+        const Duration(milliseconds: 500), (_) => _autoScrollFeatures());
+
+    // Start testimonial auto slide every 3 seconds
+    _testiAutoSlideTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      final nextPage = (_testiPageController.page ?? 0) + 1;
+      if (_testiPageController.hasClients) {
+        _testiPageController.animateToPage(
+          (nextPage.toInt()) % _testimonials.length,
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeInOut,
+        );
+      }
     });
   }
 
@@ -26,244 +60,344 @@ class _LandingPageState extends State<LandingPage> {
   void dispose() {
     _scrollController.dispose();
     _scrollNotifier.dispose();
+    _featureAutoScrollTimer?.cancel();
+    _featureScrollController.dispose();
+    _testiAutoSlideTimer?.cancel();
+    _testiPageController.dispose();
     super.dispose();
   }
+
+  // small step auto-scroll
+  void _autoScrollFeatures() {
+    if (!_featureScrollController.hasClients) return;
+
+    // compute next offset (looping)
+    final maxScroll = _featureScrollController.position.maxScrollExtent;
+    double next = _featureScrollController.offset + 120; // step
+    if (next >= maxScroll) {
+      // jump back to start smoothly
+      _featureScrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 700),
+        curve: Curves.easeOut,
+      );
+    } else {
+      _featureScrollController.animateTo(
+        next,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.linear,
+      );
+    }
+  }
+
+  // Testimonials data (kept local)
+  final List<Map<String, String>> _testimonials = const [
+    {
+      "quote":
+          "SmartKare helped me connect with a specialist in minutes. The AI symptom checker is amazing!",
+      "author": "Aarav, Patient"
+    },
+    {
+      "quote":
+          "Managing hospital operations is now effortless with SmartKare’s blockchain and AI features.",
+      "author": "Dr. Meera, Cardiologist"
+    },
+    {
+      "quote":
+          "The virtual consultations are smooth and reliable. Highly recommended platform!",
+      "author": "Rohit, Patient"
+    },
+    {
+      "quote":
+          "Booking and follow-ups are seamless. Doctors are prompt and supportive.",
+      "author": "Sana, Patient"
+    }
+  ];
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final isSmall = size.width < 800;
 
     return Scaffold(
+      // Use a transparent appbar area (we draw our own nav row)
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: const Text(
-          "SmartKare 🏥",
-          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: ValueListenableBuilder<double>(
-        valueListenable: _scrollNotifier,
-        builder: (context, scrollOffset, _) {
-          return SingleChildScrollView(
-            controller: _scrollController,
-            child: Column(
-              children: [
-                // 🌟 HERO SECTION (Animated Parallax)
-                _AnimatedSection(
-                  visible: scrollOffset < 200,
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: Transform.translate(
-                          offset: Offset(0, scrollOffset * 0.2),
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [Color(0xFF1565C0), Color(0xFF42A5F5)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: size.height * 0.9,
-                        width: double.infinity,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              "Welcome to SmartKare",
-                              style: TextStyle(
-                                fontSize: 42,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 40),
-                              child: Text(
-                                "AI-powered hospital management, robotic healthcare, and holographic telemedicine for the future of digital health.",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white70,
-                                  height: 1.4,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 40),
-                            Wrap(
-                              spacing: 20,
-                              children: [
-                                _HoverButton(
-                                  label: "Login",
-                                  color: Colors.white,
-                                  textColor: Colors.blueAccent,
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) =>
-                                            const UniversalLoginPage()),
-                                  ),
-                                ),
-                                _HoverButton(
-                                  label: "Register",
-                                  outlined: true,
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) =>
-                                            const UniversalRegisterPage()),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const _GradientDivider(),
-
-                // 🔹 ABOUT SECTION
-                _SectionContainer(
-                  color: Colors.white,
-                  title: "About SmartKare",
-                  content:
-                      "SmartKare is an intelligent healthcare ecosystem integrating AI diagnostics, blockchain transparency, and robotic operations to redefine patient care for the digital future.",
-                ),
-
-                const _GradientDivider(),
-
-                // 🔹 FEATURE GRID (Animated)
-                const _AnimatedFeatureGrid(),
-
-                // 🔹 LIVE STATS (Animated Counters)
-                _AnimatedSection(
-                  visible: scrollOffset > 400,
-                  child: const _AnimatedStatsSection(),
-                ),
-
-                const _GradientDivider(),
-
-                // 🔹 BOOK APPOINTMENT (Animated)
-                _BookAppointmentSection(scrollOffset: scrollOffset),
-
-                // 🔹 AI SYMPTOM CHECKER
-                _SectionContainer(
-                  color: const Color(0xFF1976D2),
-                  title: "AI Symptom Checker 🤖",
-                  content:
-                      "Describe your symptoms and let our AI suggest the right specialist in seconds. Experience Smart Diagnosis — the future of medical triage.",
-                  textColor: Colors.white,
-                ),
-
-                // 🔹 TESTIMONIALS
-                _AnimatedSection(
-                  visible: scrollOffset > 900,
-                  child: const _TestimonialsSection(),
-                ),
-
-                // 🔹 CONTACT SECTION
-                _SectionContainer(
-                  color: Colors.white,
-                  title: "Contact Us",
-                  content:
-                      "📧 support@smartkare.com\n📞 +91 98765 43210\n🏢 Hyderabad, Andhra Pradesh, India",
-                ),
-
-                // 🔹 FOOTER
-                Container(
-                  color: const Color(0xFF0D47A1),
-                  padding: const EdgeInsets.all(20),
-                  child: const Center(
-                    child: Text(
-                      "© 2025 SmartKare | Designed by Teja Kotcherla",
-                      style: TextStyle(color: Colors.white70, fontSize: 14),
+      body: SafeArea(
+        top: true,
+        child: ValueListenableBuilder<double>(
+          valueListenable: _scrollNotifier,
+          builder: (context, scrollOffset, _) {
+            return SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                children: [
+                  // ----- NAV BAR -----
+                  _TopNavBar(
+                    onLogin: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const UniversalLoginPage()),
+                    ),
+                    onRegister: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const UniversalRegisterPage()),
                     ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
+
+                  // ----- HERO -----
+                  _AnimatedSection(
+                    visible: scrollOffset < 150,
+                    child: _HeroSection(
+                      height: isSmall ? 520 : 680,
+                      onBook: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const AppointmentPage()),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  // ----- ABOUT (expanded) -----
+                  _AnimatedSection(
+                    visible: scrollOffset > 120,
+                    child: _AboutSection(),
+                  ),
+
+                  const SizedBox(height: 6),
+
+                  // ----- KEY FEATURES (horizontal, auto-scroll) -----
+                  _AnimatedSection(
+                    visible: scrollOffset > 260,
+                    child: Container(
+                      color: const Color(0xFFF4F8FB),
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      child: Column(
+                        children: [
+                          const SectionTitle(title: "Key Features"),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            height: 120,
+                            child: ListView.separated(
+                              controller: _featureScrollController,
+                              scrollDirection: Axis.horizontal,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              itemCount: _features.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(width: 12),
+                              itemBuilder: (context, index) {
+                                final f = _features[index];
+                                return _FeatureChip(
+                                  icon: f.icon,
+                                  label: f.label,
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // ----- TESTIMONIALS (2 per view, auto-slide) -----
+                  _AnimatedSection(
+                    visible: scrollOffset > 420,
+                    child: Container(
+                      color: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      child: Column(
+                        children: [
+                          const SectionTitle(title: "What Our Users Say"),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            height: 220,
+                            // PageView with viewportFraction 0.5 -> shows 2 per screen horizontally
+                            child: PageView.builder(
+                              controller: _testiPageController,
+                              itemCount: _testimonials.length,
+                              itemBuilder: (context, index) {
+                                final t = _testimonials[index];
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
+                                  child: _TestimonialCard(
+                                    quote: t['quote']!,
+                                    author: t['author']!,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  // ----- CONTACT + FOOTER combined -----
+                  _AnimatedSection(
+                    visible: scrollOffset > 700,
+                    child: _ContactFooterSection(),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
+
+  // local list of features
+  final List<_Feature> _features = const [
+    _Feature(icon: Icons.calendar_month, label: "Online OP Booking"),
+    _Feature(icon: Icons.local_hospital, label: "Hospital Management"),
+    _Feature(icon: Icons.video_call, label: "Telemedicine"),
+    _Feature(icon: Icons.shield, label: "Blockchain Security"),
+    _Feature(icon: Icons.science, label: "AI Diagnosis"),
+    _Feature(icon: Icons.analytics, label: "Predictive Analytics"),
+    _Feature(icon: Icons.medication, label: "Pharmacy Management"),
+    _Feature(icon: Icons.monitor_heart, label: "Remote Monitoring"),
+  ];
 }
 
-//
-// 🌈 Reusable Widgets
-//
-
-class _HoverButton extends StatefulWidget {
-  final String label;
-  final Color color;
-  final Color textColor;
-  final bool outlined;
-  final VoidCallback onTap;
-
-  const _HoverButton({
-    required this.label,
-    this.color = Colors.blueAccent,
-    this.textColor = Colors.white,
-    this.outlined = false,
-    required this.onTap,
-  });
-
-  @override
-  State<_HoverButton> createState() => _HoverButtonState();
-}
-
-class _HoverButtonState extends State<_HoverButton> {
-  bool _hovering = false;
+// ----------------------------- NAVBAR -----------------------------
+class _TopNavBar extends StatelessWidget {
+  final VoidCallback onLogin;
+  final VoidCallback onRegister;
+  const _TopNavBar({required this.onLogin, required this.onRegister});
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovering = true),
-      onExit: (_) => setState(() => _hovering = false),
-      child: AnimatedScale(
-        duration: const Duration(milliseconds: 200),
-        scale: _hovering ? 1.05 : 1.0,
-        child: ElevatedButton(
-          onPressed: widget.onTap,
-          style: ElevatedButton.styleFrom(
-            backgroundColor:
-                widget.outlined ? Colors.transparent : widget.color,
-            foregroundColor: widget.textColor,
-            side: widget.outlined
-                ? const BorderSide(color: Colors.white)
-                : BorderSide.none,
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          child: Text(widget.label, style: const TextStyle(fontSize: 18)),
-        ),
-      ),
+    final width = MediaQuery.of(context).size.width;
+    final isSmall = width < 900;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      color: Colors.transparent,
+      child: LayoutBuilder(builder: (context, constraints) {
+        return Row(
+          children: [
+            // Logo (left)
+            Row(
+              children: [
+                // Replace 'assets/images/logo.png' with your logo file
+                Container(
+                  height: 42,
+                  width: 42,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 6,
+                          offset: Offset(0, 2))
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, _, __) {
+                        // fallback simple icon if asset missing
+                        return const Icon(Icons.local_hospital,
+                            color: Colors.blueAccent);
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Text(
+                  "SmartKare",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+              ],
+            ),
+
+            // Spacer center (nav links)
+            Expanded(
+              child: Center(
+                child: isSmall
+                    // on small screens show a minimal menu
+                    ? PopupMenuButton<int>(
+                        icon: const Icon(Icons.menu),
+                        itemBuilder: (_) => [
+                          const PopupMenuItem(value: 0, child: Text("Home")),
+                          const PopupMenuItem(value: 1, child: Text("About")),
+                          const PopupMenuItem(
+                              value: 2, child: Text("Specialists")),
+                          const PopupMenuItem(
+                              value: 3, child: Text("Contact Us")),
+                        ],
+                        onSelected: (v) {
+                          // noop: you can add scroll/navigate behaviour
+                        },
+                      )
+                    : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _NavLink(label: "Home"),
+                          const SizedBox(width: 18),
+                          _NavLink(label: "About"),
+                          const SizedBox(width: 18),
+                          _NavLink(label: "Specialists"),
+                          const SizedBox(width: 18),
+                          _NavLink(label: "Contact Us"),
+                        ],
+                      ),
+              ),
+            ),
+
+            // Right side - Login/Register
+            Row(
+              children: [
+                TextButton(
+                  onPressed: onLogin,
+                  child: const Text("Login"),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: onRegister,
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: const Text("Register"),
+                ),
+              ],
+            ),
+          ],
+        );
+      }),
     );
   }
 }
 
+// ------------------------------------------------------------
+// 🔹 Animated Section Wrapper (Smooth slide + fade)
+// ------------------------------------------------------------
 class _AnimatedSection extends StatelessWidget {
   final Widget child;
   final bool visible;
-  const _AnimatedSection({required this.child, required this.visible});
+
+  const _AnimatedSection({
+    required this.child,
+    required this.visible,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AnimatedSlide(
-      offset: visible ? Offset.zero : const Offset(0, 0.2),
+      offset: visible ? Offset.zero : const Offset(0, 0.1),
       duration: const Duration(milliseconds: 600),
       curve: Curves.easeOut,
       child: AnimatedOpacity(
@@ -275,94 +409,171 @@ class _AnimatedSection extends StatelessWidget {
   }
 }
 
-class _GradientDivider extends StatelessWidget {
-  const _GradientDivider();
+class _NavLink extends StatelessWidget {
+  final String label;
+  const _NavLink({required this.label});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 3,
-      margin: const EdgeInsets.symmetric(vertical: 20),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.blueAccent, Colors.lightBlue, Colors.cyan],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
+    return InkWell(
+      onTap: () {
+        // optionally implement scroll to section
+      },
+      child: Text(
+        label,
+        style: const TextStyle(fontSize: 16, color: Colors.black87),
       ),
     );
   }
 }
 
-//
-// 🔹 BOOK APPOINTMENT SECTION (Upgraded)
-//
-class _BookAppointmentSection extends StatelessWidget {
-  final double scrollOffset;
-  const _BookAppointmentSection({required this.scrollOffset});
+// ----------------------------- HERO -----------------------------
+class _HeroSection extends StatelessWidget {
+  final double height;
+  final VoidCallback onBook;
+  const _HeroSection({required this.height, required this.onBook});
 
   @override
   Widget build(BuildContext context) {
-    return _AnimatedSection(
-      visible: scrollOffset > 600,
-      child: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFFE3F2FD), Color(0xFFFFFFFF)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+    final isSmall = MediaQuery.of(context).size.width < 900;
+
+    return Container(
+      height: height,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      child: Row(
+        children: [
+          // Left column: title + CTA
+          Expanded(
+            flex: 6,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Healthcare, Reimagined.",
+                  style: TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  "SmartKare combines AI diagnostics, secure data with blockchain, and intuitive OP booking to deliver faster, smarter care.",
+                  style: TextStyle(
+                      fontSize: 16, color: Colors.black54, height: 1.4),
+                ),
+                const SizedBox(height: 22),
+                Row(
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: onBook,
+                      icon: const Icon(Icons.calendar_month),
+                      label: const Text("Book Appointment"),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 14),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    OutlinedButton(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const UniversalRegisterPage()),
+                      ),
+                      child: const Text("Get Started"),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 20),
+
+          // Right column: Lottie or illustration
+          Expanded(
+            flex: 5,
+            child: Center(
+              child: SizedBox(
+                width: isSmall ? 260 : 420,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Lottie placeholder; add your lottie at assets/animations/hero_health.json
+                    if (!kIsWeb) // Lottie works on web but if you want conditional handling, adjust as needed
+                      Lottie.asset(
+                        'assets/animations/hero_health.json',
+                        height: isSmall ? 200 : 300,
+                        fit: BoxFit.contain,
+                        // if asset missing, show fallback icon via errorBuilder
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.health_and_safety,
+                              size: 120, color: Colors.blueAccent);
+                        },
+                      )
+                    else
+                      // web / fallback
+                      const Icon(Icons.health_and_safety,
+                          size: 140, color: Colors.blueAccent),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ----------------------------- ABOUT -----------------------------
+class _AboutSection extends StatelessWidget {
+  const _AboutSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final isSmall = MediaQuery.of(context).size.width < 900;
+
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1100),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SectionTitle(title: "Book an Appointment 🗓️"),
-            const SizedBox(height: 16),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                "Instantly connect with doctors for online or in-person consultations — powered by SmartKare’s AI scheduling system.",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black87, fontSize: 16),
-              ),
+            const SectionTitle(title: "About SmartKare"),
+            const SizedBox(height: 12),
+            Text(
+              "SmartKare is a next-generation digital healthcare ecosystem designed to put patients first. "
+              "We combine AI-driven symptom analysis, secure and transparent records using blockchain, telemedicine, and a smart OP booking engine so patients find the right care quickly. "
+              "Our platform supports both virtual and in-person consultations and focuses on speed, security, and accessibility.",
+              style: TextStyle(
+                  fontSize: isSmall ? 14 : 16,
+                  color: Colors.black87,
+                  height: 1.5),
             ),
-            const SizedBox(height: 30),
-            TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0.9, end: 1.0),
-              duration: const Duration(milliseconds: 800),
-              curve: Curves.easeOutBack,
-              builder: (context, scale, child) {
-                return Transform.scale(scale: scale, child: child);
-              },
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AppointmentPage()),
-                  );
-                },
-                icon: const Icon(Icons.calendar_month),
-                label: const Text(
-                  "Book Appointment",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)),
-                  shadowColor: Colors.blueAccent.withOpacity(0.4),
-                  elevation: 10,
-                ),
-              ),
+            const SizedBox(height: 18),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: const [
+                _AboutBadge(icon: Icons.security, title: "Data Security"),
+                _AboutBadge(icon: Icons.access_time, title: "Faster Bookings"),
+                _AboutBadge(icon: Icons.support_agent, title: "24/7 Support"),
+                _AboutBadge(
+                    icon: Icons.leaderboard, title: "Analytics & Insights"),
+              ],
             ),
-            const SizedBox(height: 10),
-            const Text(
-              "It only takes a minute to schedule your consultation.",
-              style: TextStyle(color: Colors.black54, fontSize: 14),
+            const SizedBox(height: 18),
+            // secondary paragraph with more details
+            Text(
+              "Built for hospitals and patients alike, SmartKare scales from small clinics to large hospital networks. We emphasize interoperability, privacy-by-design, and a smooth patient journey — from discovery to follow-up.",
+              style: TextStyle(
+                  fontSize: isSmall ? 13 : 15,
+                  color: Colors.black54,
+                  height: 1.4),
             ),
           ],
         ),
@@ -371,255 +582,232 @@ class _BookAppointmentSection extends StatelessWidget {
   }
 }
 
-//
-// 🔹 FEATURE GRID (Animated Staggered Entry)
-//
-class _AnimatedFeatureGrid extends StatelessWidget {
-  const _AnimatedFeatureGrid();
-
-  @override
-  Widget build(BuildContext context) {
-    final features = [
-      {"icon": Icons.calendar_month, "title": "Online OP Booking"},
-      {"icon": Icons.local_hospital_rounded, "title": "Hospital Management"},
-      {"icon": Icons.video_call_rounded, "title": "Telemedicine"},
-      {"icon": Icons.shield_rounded, "title": "Blockchain Security"},
-      {"icon": Icons.science_rounded, "title": "AI Diagnosis"},
-      {"icon": Icons.analytics_rounded, "title": "Predictive Analytics"},
-    ];
-
-    return Container(
-      color: const Color(0xFFF4F8FB),
-      padding: const EdgeInsets.all(40),
-      child: Column(
-        children: [
-          const SectionTitle(title: "Key Features ⚙️"),
-          const SizedBox(height: 20),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: features.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 20,
-              mainAxisSpacing: 20,
-              childAspectRatio: 1.2,
-            ),
-            itemBuilder: (context, index) {
-              final f = features[index];
-              return TweenAnimationBuilder<double>(
-                tween: Tween(begin: 0.0, end: 1.0),
-                duration: Duration(milliseconds: 400 + (index * 100)),
-                builder: (context, value, child) => Opacity(
-                  opacity: value,
-                  child: Transform.scale(
-                    scale: 0.8 + (0.2 * value),
-                    child: child,
-                  ),
-                ),
-                child: Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(f["icon"] as IconData,
-                            size: 40, color: Colors.blueAccent),
-                        const SizedBox(height: 10),
-                        Text(f["title"] as String,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w500)),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-//
-// 🔹 Animated Stats Section (with number animation)
-//
-class _AnimatedStatsSection extends StatelessWidget {
-  const _AnimatedStatsSection();
-
-  @override
-  Widget build(BuildContext context) {
-    final stats = [
-      {"icon": Icons.people, "label": "Patients Served", "count": 25000},
-      {
-        "icon": Icons.medical_services,
-        "label": "Doctors Available",
-        "count": 1200
-      },
-      {
-        "icon": Icons.health_and_safety,
-        "label": "Successful Consults",
-        "count": 18000
-      },
-    ];
-
-    return Container(
-      color: const Color(0xFFE3F2FD),
-      padding: const EdgeInsets.symmetric(vertical: 50),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: stats.map((s) {
-          return Column(
-            children: [
-              Icon(s["icon"] as IconData, size: 40, color: Colors.blueAccent),
-              const SizedBox(height: 10),
-              TweenAnimationBuilder<int>(
-                tween: IntTween(begin: 0, end: s["count"] as int),
-                duration: const Duration(seconds: 2),
-                builder: (context, value, _) => Text(
-                  "$value+",
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 22),
-                ),
-              ),
-              Text(s["label"] as String,
-                  style: const TextStyle(color: Colors.black54, fontSize: 14)),
-            ],
-          );
-        }).toList(),
-      ),
-    );
-  }
-}
-
-//
-// 🔹 Testimonials Section (same as before)
-//
-class _TestimonialsSection extends StatelessWidget {
-  const _TestimonialsSection();
-
-  @override
-  Widget build(BuildContext context) {
-    final testimonials = const [
-      {
-        "quote":
-            "SmartKare helped me connect with a specialist in minutes. The AI symptom checker is amazing!",
-        "author": "Aarav, Patient"
-      },
-      {
-        "quote":
-            "Managing hospital operations is now effortless with SmartKare’s blockchain and AI features.",
-        "author": "Dr. Meera, Cardiologist"
-      },
-      {
-        "quote":
-            "The virtual consultations are smooth and reliable. Highly recommended platform!",
-        "author": "Rohit, Patient"
-      },
-    ];
-
-    return Container(
-      color: const Color(0xFFF4F8FB),
-      padding: const EdgeInsets.all(40),
-      child: Column(
-        children: [
-          const SectionTitle(title: "What Our Users Say 💬"),
-          const SizedBox(height: 20),
-          SizedBox(
-            height: 180,
-            child: PageView.builder(
-              controller: PageController(viewportFraction: 0.9),
-              itemCount: testimonials.length,
-              itemBuilder: (context, index) {
-                final t = testimonials[index];
-                return Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "\"${t['quote']}\"",
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                              fontSize: 16, fontStyle: FontStyle.italic),
-                        ),
-                        const SizedBox(height: 10),
-                        Text("- ${t['author']}",
-                            style: const TextStyle(
-                                color: Colors.blueAccent,
-                                fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SectionContainer extends StatelessWidget {
+class _AboutBadge extends StatelessWidget {
+  final IconData icon;
   final String title;
-  final String content;
-  final Color color;
-  final Color textColor;
-  final Widget? child;
-
-  const _SectionContainer({
-    required this.title,
-    required this.content,
-    required this.color,
-    this.textColor = Colors.black87,
-    this.child,
-  });
+  const _AboutBadge({required this.icon, required this.title});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: color,
-      padding: const EdgeInsets.all(40),
-      child: Column(
+      constraints: const BoxConstraints(minWidth: 150),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.blueAccent.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.blueAccent.withOpacity(0.12)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          SectionTitle(title: title, color: textColor),
-          const SizedBox(height: 10),
-          Text(
-            content,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, color: textColor),
-          ),
-          if (child != null) ...[
-            const SizedBox(height: 20),
-            child!,
-          ]
+          Icon(icon, color: Colors.blueAccent),
+          const SizedBox(width: 8),
+          Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
         ],
       ),
     );
   }
 }
 
+// ----------------------------- FEATURES -----------------------------
+class _Feature {
+  final IconData icon;
+  final String label;
+  const _Feature({required this.icon, required this.label});
+}
+
+class _FeatureChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  const _FeatureChip({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 220,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black12, blurRadius: 6, offset: const Offset(0, 4))
+        ],
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+              backgroundColor: Colors.blueAccent.withOpacity(0.02),
+              child: Icon(icon, color: Colors.blueAccent)),
+          const SizedBox(width: 12),
+          Expanded(
+              child: Text(label,
+                  style: const TextStyle(fontWeight: FontWeight.w600))),
+        ],
+      ),
+    );
+  }
+}
+
+// ----------------------------- TESTIMONIALS -----------------------------
+class _TestimonialCard extends StatelessWidget {
+  final String quote;
+  final String author;
+  const _TestimonialCard({required this.quote, required this.author});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.format_quote,
+                color: Colors.blueAccent.withOpacity(0.2), size: 30),
+            const SizedBox(height: 8),
+            Text(
+              quote,
+              textAlign: TextAlign.center,
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text("- $author",
+                  style: const TextStyle(
+                      color: Colors.blueAccent, fontWeight: FontWeight.bold)),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ----------------------------- CONTACT + FOOTER -----------------------------
+class _ContactFooterSection extends StatelessWidget {
+  const _ContactFooterSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final isSmall = MediaQuery.of(context).size.width < 900;
+    return Container(
+      width: double.infinity,
+      color: const Color(0xFF0D47A1),
+      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 16),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1100),
+        child: isSmall ? _mobileContact() : _desktopContact(),
+      ),
+    );
+  }
+
+  Widget _desktopContact() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // left: brand + brief
+        Expanded(
+          flex: 4,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text("SmartKare",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold)),
+              SizedBox(height: 8),
+              Text(
+                  "Delivering smarter, faster healthcare with AI and secure systems. Contact us for demos and integrations.",
+                  style: TextStyle(color: Colors.white70)),
+            ],
+          ),
+        ),
+
+        // center: contact
+        Expanded(
+          flex: 4,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              SizedBox(height: 4),
+              Text("Contact",
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
+              SizedBox(height: 8),
+              Text("📧 support@smartkare.com",
+                  style: TextStyle(color: Colors.white70)),
+              Text("📞 +91 98765 43210",
+                  style: TextStyle(color: Colors.white70)),
+              Text("🏢 Hyderabad, Andhra Pradesh, India",
+                  style: TextStyle(color: Colors.white70)),
+            ],
+          ),
+        ),
+
+        // right: small links
+        Expanded(
+          flex: 3,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text("Quick Links",
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
+              SizedBox(height: 8),
+              Text("Home", style: TextStyle(color: Colors.white70)),
+              Text("About", style: TextStyle(color: Colors.white70)),
+              Text("Specialists", style: TextStyle(color: Colors.white70)),
+              Text("Privacy", style: TextStyle(color: Colors.white70)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _mobileContact() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: const [
+        Text("SmartKare",
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold)),
+        SizedBox(height: 10),
+        Text("📧 support@smartkare.com",
+            style: TextStyle(color: Colors.white70)),
+        SizedBox(height: 6),
+        Text("📞 +91 98765 43210", style: TextStyle(color: Colors.white70)),
+        SizedBox(height: 6),
+        Text("🏢 Hyderabad, Andhra Pradesh, India",
+            style: TextStyle(color: Colors.white70)),
+        SizedBox(height: 12),
+        Text("© 2025 SmartKare | Designed by Teja Kotcherla",
+            style: TextStyle(color: Colors.white38, fontSize: 12)),
+      ],
+    );
+  }
+}
+
+// ----------------------------- UTIL -----------------------------
 class SectionTitle extends StatelessWidget {
   final String title;
-  final Color color;
-  const SectionTitle(
-      {super.key, required this.title, this.color = Colors.black87});
+  const SectionTitle({required this.title});
 
   @override
   Widget build(BuildContext context) {
     return Text(
       title,
-      style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: color),
+      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
     );
   }
 }
