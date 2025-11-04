@@ -127,10 +127,8 @@ class _QuickActions extends StatelessWidget {
         "title": "Book Appointment",
         "color": Colors.blueAccent,
         "onTap": () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const AppointmentPage()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const AppointmentPage()));
         }
       },
       {
