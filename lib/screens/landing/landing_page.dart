@@ -9,6 +9,35 @@ import '../auth/universal_login.dart';
 import '../auth/universal_register.dart';
 import '../appointments/appointment_page.dart';
 
+/// -----------------------------
+/// Color & style constants
+/// -----------------------------
+const Color kPrimaryBlue = Color(0xFF0077B6); // deep healthcare blue
+const Color kAccentCyan = Color(0xFF00B4D8); // aqua cyan
+const Color kSoftBg = Color(0xFFCAF0F8); // soft background
+const double kCardRadius = 14.0;
+
+/// Simple hover helper for web/desktop - safe to be added (non-destructive)
+class HoverWidget extends StatefulWidget {
+  final Widget Function(bool hovered) builder;
+  const HoverWidget({required this.builder, Key? key}) : super(key: key);
+
+  @override
+  State<HoverWidget> createState() => _HoverWidgetState();
+}
+
+class _HoverWidgetState extends State<HoverWidget> {
+  bool _hovered = false;
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: widget.builder(_hovered),
+    );
+  }
+}
+
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
 
@@ -120,6 +149,7 @@ class _LandingPageState extends State<LandingPage> {
     final isSmall = size.width < 800;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       // Use a transparent appbar area (we draw our own nav row)
       extendBodyBehindAppBar: true,
       body: SafeArea(
@@ -172,7 +202,7 @@ class _LandingPageState extends State<LandingPage> {
                   _AnimatedSection(
                     visible: scrollOffset > 260,
                     child: Container(
-                      color: const Color(0xFFF4F8FB),
+                      color: kSoftBg,
                       padding: const EdgeInsets.symmetric(vertical: 24),
                       child: Column(
                         children: [
@@ -280,7 +310,20 @@ class _TopNavBar extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      color: Colors.transparent,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [kPrimaryBlue, kAccentCyan],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
       child: LayoutBuilder(builder: (context, constraints) {
         return Row(
           children: [
@@ -289,16 +332,16 @@ class _TopNavBar extends StatelessWidget {
               children: [
                 // Replace 'assets/images/logo.png' with your logo file
                 Container(
-                  height: 42,
-                  width: 42,
+                  height: 44,
+                  width: 44,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 6,
-                          offset: Offset(0, 2))
+                          color: Colors.black26,
+                          blurRadius: 8,
+                          offset: Offset(0, 4))
                     ],
                   ),
                   child: Padding(
@@ -309,7 +352,7 @@ class _TopNavBar extends StatelessWidget {
                       errorBuilder: (context, _, __) {
                         // fallback simple icon if asset missing
                         return const Icon(Icons.local_hospital,
-                            color: Colors.blueAccent);
+                            color: kPrimaryBlue);
                       },
                     ),
                   ),
@@ -317,7 +360,10 @@ class _TopNavBar extends StatelessWidget {
                 const SizedBox(width: 12),
                 const Text(
                   "SmartKare",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.white),
                 ),
               ],
             ),
@@ -328,7 +374,7 @@ class _TopNavBar extends StatelessWidget {
                 child: isSmall
                     // on small screens show a minimal menu
                     ? PopupMenuButton<int>(
-                        icon: const Icon(Icons.menu),
+                        icon: const Icon(Icons.menu, color: Colors.white),
                         itemBuilder: (_) => [
                           const PopupMenuItem(value: 0, child: Text("Home")),
                           const PopupMenuItem(value: 1, child: Text("About")),
@@ -361,17 +407,28 @@ class _TopNavBar extends StatelessWidget {
               children: [
                 TextButton(
                   onPressed: onLogin,
-                  child: const Text("Login"),
+                  child: const Text("Login",
+                      style: TextStyle(color: Colors.white70)),
                 ),
                 const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: onRegister,
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
-                  ),
-                  child: const Text("Register"),
-                ),
+                HoverWidget(builder: (hovered) {
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    transform: hovered
+                        ? (Matrix4.identity()..scale(1.03))
+                        : Matrix4.identity(),
+                    child: ElevatedButton(
+                      onPressed: onRegister,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: kPrimaryBlue,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text("Register"),
+                    ),
+                  );
+                }),
               ],
             ),
           ],
@@ -397,7 +454,7 @@ class _AnimatedSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedSlide(
-      offset: visible ? Offset.zero : const Offset(0, 0.1),
+      offset: visible ? Offset.zero : const Offset(0, 0.06),
       duration: const Duration(milliseconds: 600),
       curve: Curves.easeOut,
       child: AnimatedOpacity(
@@ -415,15 +472,24 @@ class _NavLink extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        // optionally implement scroll to section
-      },
-      child: Text(
-        label,
-        style: const TextStyle(fontSize: 16, color: Colors.black87),
-      ),
-    );
+    return HoverWidget(builder: (hovered) {
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: hovered ? Colors.white.withOpacity(0.08) : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 16,
+            color: hovered ? Colors.white : Colors.white70,
+            fontWeight: hovered ? FontWeight.w700 : FontWeight.w600,
+          ),
+        ),
+      );
+    });
   }
 }
 
@@ -440,6 +506,13 @@ class _HeroSection extends StatelessWidget {
     return Container(
       height: height,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [kPrimaryBlue, kAccentCyan],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
       child: Row(
         children: [
           // Left column: title + CTA
@@ -454,28 +527,39 @@ class _HeroSection extends StatelessWidget {
                   style: TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87),
+                      color: Colors.white),
                 ),
                 const SizedBox(height: 10),
                 const Text(
                   "SmartKare combines AI diagnostics, secure data with blockchain, and intuitive OP booking to deliver faster, smarter care.",
                   style: TextStyle(
-                      fontSize: 16, color: Colors.black54, height: 1.4),
+                      fontSize: 16, color: Colors.white70, height: 1.4),
                 ),
                 const SizedBox(height: 22),
                 Row(
                   children: [
-                    ElevatedButton.icon(
-                      onPressed: onBook,
-                      icon: const Icon(Icons.calendar_month),
-                      label: const Text("Book Appointment"),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 14),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                    ),
+                    HoverWidget(builder: (hovered) {
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        transform: hovered
+                            ? (Matrix4.identity()..scale(1.04))
+                            : Matrix4.identity(),
+                        child: ElevatedButton.icon(
+                          onPressed: onBook,
+                          icon: const Icon(Icons.calendar_month),
+                          label: const Text("Book Appointment"),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 14),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            backgroundColor: Colors.white,
+                            foregroundColor: kPrimaryBlue,
+                            elevation: hovered ? 10 : 3,
+                          ),
+                        ),
+                      );
+                    }),
                     const SizedBox(width: 12),
                     OutlinedButton(
                       onPressed: () => Navigator.push(
@@ -483,7 +567,33 @@ class _HeroSection extends StatelessWidget {
                         MaterialPageRoute(
                             builder: (_) => const UniversalRegisterPage()),
                       ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.white70),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        foregroundColor: Colors.white,
+                      ),
                       child: const Text("Get Started"),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                // small secondary cards
+                Row(
+                  children: [
+                    _StatPill(
+                      icon: Icons.verified_user,
+                      label: "Secure",
+                    ),
+                    const SizedBox(width: 10),
+                    _StatPill(
+                      icon: Icons.speed,
+                      label: "Fast",
+                    ),
+                    const SizedBox(width: 10),
+                    _StatPill(
+                      icon: Icons.support_agent,
+                      label: "24/7",
                     ),
                   ],
                 ),
@@ -501,7 +611,7 @@ class _HeroSection extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Lottie placeholder; add your lottie at assets/animations/hero_health.json
-                    if (!kIsWeb) // Lottie works on web but if you want conditional handling, adjust as needed
+                    if (!kIsWeb)
                       Lottie.asset(
                         'assets/animations/hero_health.json',
                         height: isSmall ? 200 : 300,
@@ -509,18 +619,42 @@ class _HeroSection extends StatelessWidget {
                         // if asset missing, show fallback icon via errorBuilder
                         errorBuilder: (context, error, stackTrace) {
                           return const Icon(Icons.health_and_safety,
-                              size: 120, color: Colors.blueAccent);
+                              size: 120, color: Colors.white70);
                         },
                       )
                     else
                       // web / fallback
                       const Icon(Icons.health_and_safety,
-                          size: 140, color: Colors.blueAccent),
+                          size: 140, color: Colors.white70),
                   ],
                 ),
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatPill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  const _StatPill({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.white70, size: 18),
+          const SizedBox(width: 8),
+          Text(label, style: const TextStyle(color: Colors.white70)),
         ],
       ),
     );
@@ -593,14 +727,25 @@ class _AboutBadge extends StatelessWidget {
       constraints: const BoxConstraints(minWidth: 150),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.blueAccent.withOpacity(0.08),
+        gradient: LinearGradient(
+          colors: [Colors.white, kSoftBg.withOpacity(0.7)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.blueAccent.withOpacity(0.12)),
+        border: Border.all(color: kPrimaryBlue.withOpacity(0.08)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.blueAccent),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: kPrimaryBlue.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: kPrimaryBlue),
+          ),
           const SizedBox(width: 8),
           Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
         ],
@@ -623,29 +768,36 @@ class _FeatureChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 220,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black12, blurRadius: 6, offset: const Offset(0, 4))
-        ],
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-              backgroundColor: Colors.blueAccent.withOpacity(0.02),
-              child: Icon(icon, color: Colors.blueAccent)),
-          const SizedBox(width: 12),
-          Expanded(
-              child: Text(label,
-                  style: const TextStyle(fontWeight: FontWeight.w600))),
-        ],
-      ),
-    );
+    return HoverWidget(builder: (hovered) {
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        width: 220,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: hovered ? Colors.white : Colors.white,
+          borderRadius: BorderRadius.circular(kCardRadius),
+          boxShadow: [
+            BoxShadow(
+                color: hovered ? kAccentCyan.withOpacity(0.16) : Colors.black12,
+                blurRadius: hovered ? 14 : 8,
+                offset: const Offset(0, 6))
+          ],
+          border: Border.all(color: kPrimaryBlue.withOpacity(0.06)),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+                backgroundColor: kAccentCyan.withOpacity(0.12),
+                child: Icon(icon, color: kPrimaryBlue)),
+            const SizedBox(width: 12),
+            Expanded(
+                child: Text(label,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w600, color: Colors.black87))),
+          ],
+        ),
+      );
+    });
   }
 }
 
@@ -657,36 +809,39 @@ class _TestimonialCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(18.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.format_quote,
-                color: Colors.blueAccent.withOpacity(0.2), size: 30),
-            const SizedBox(height: 8),
-            Text(
-              quote,
-              textAlign: TextAlign.center,
-              maxLines: 4,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 14, color: Colors.black87),
-            ),
-            const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text("- $author",
-                  style: const TextStyle(
-                      color: Colors.blueAccent, fontWeight: FontWeight.bold)),
-            )
-          ],
+    return HoverWidget(builder: (hovered) {
+      return Card(
+        elevation: hovered ? 12 : 6,
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        child: Padding(
+          padding: const EdgeInsets.all(18.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.format_quote,
+                  color: kPrimaryBlue.withOpacity(0.14), size: 30),
+              const SizedBox(height: 8),
+              Text(
+                quote,
+                textAlign: TextAlign.center,
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                    fontSize: 14, color: Colors.black87.withOpacity(0.95)),
+              ),
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Text("- $author",
+                    style: TextStyle(
+                        color: kPrimaryBlue, fontWeight: FontWeight.bold)),
+              )
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
 
@@ -699,7 +854,13 @@ class _ContactFooterSection extends StatelessWidget {
     final isSmall = MediaQuery.of(context).size.width < 900;
     return Container(
       width: double.infinity,
-      color: const Color(0xFF0D47A1),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [kPrimaryBlue, kAccentCyan],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
       padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 16),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 1100),
@@ -805,9 +966,28 @@ class SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      title,
-      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+              fontSize: 22, fontWeight: FontWeight.bold, color: kPrimaryBlue),
+        ),
+        const SizedBox(width: 8),
+        // glowing dot
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(colors: [kAccentCyan, kPrimaryBlue]),
+            boxShadow: [
+              BoxShadow(color: kAccentCyan.withOpacity(0.5), blurRadius: 8)
+            ],
+            shape: BoxShape.circle,
+          ),
+        )
+      ],
     );
   }
 }
