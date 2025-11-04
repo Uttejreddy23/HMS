@@ -7,7 +7,7 @@ class PatientDetails(Base):
 
     patient_id = Column(Integer, primary_key=True, autoincrement=True)
     first_name = Column(String(50), nullable=False)
-    second_name = Column(String(50), nullable=False)
+    last_name = Column(String(50), nullable=False)
     e_mail = Column(String(100), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
     gender = Column(String(20))

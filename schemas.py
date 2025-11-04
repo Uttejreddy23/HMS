@@ -2,7 +2,7 @@ from pydantic import BaseModel, EmailStr, validator,Field
 
 class SignupSchema(BaseModel):
     first_name: str
-    second_name: str
+    last_name: str| None=None
     e_mail: EmailStr
     password: str
     conform_password: str
