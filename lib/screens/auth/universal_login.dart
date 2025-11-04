@@ -98,7 +98,7 @@ class _UniversalLoginPageState extends State<UniversalLoginPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Text(
-                    "Hello & Welcome 👋",
+                    "Hi, Welcome! 👋",
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
@@ -119,7 +119,8 @@ class _UniversalLoginPageState extends State<UniversalLoginPage> {
                   // 🔥 Error Box (GreytHR style)
                   if (showError)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 12),
                       margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
                         color: Colors.red.shade50,
@@ -128,7 +129,8 @@ class _UniversalLoginPageState extends State<UniversalLoginPage> {
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
+                          Icon(Icons.error_outline,
+                              color: Colors.red.shade700, size: 20),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -153,7 +155,8 @@ class _UniversalLoginPageState extends State<UniversalLoginPage> {
                       ),
                     ),
                     items: const [
-                      DropdownMenuItem(value: 'Patient', child: Text('Patient')),
+                      DropdownMenuItem(
+                          value: 'Patient', child: Text('Patient')),
                       DropdownMenuItem(value: 'Doctor', child: Text('Doctor')),
                       DropdownMenuItem(value: 'Admin', child: Text('Admin')),
                     ],
