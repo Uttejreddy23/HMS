@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'universal_login.dart';
 
@@ -84,7 +82,7 @@ class _UniversalRegisterPageState extends State<UniversalRegisterPage> {
                 children: [
                   // 🏥 Title
                   const Text(
-                    "Create Patient Account 🏥",
+                    "Create your Account 🏥",
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
@@ -116,8 +114,8 @@ class _UniversalRegisterPageState extends State<UniversalRegisterPage> {
                   const SizedBox(height: 15),
 
                   // Password
-                  _buildPasswordField(passwordController, "Password",
-                      obscurePassword, () {
+                  _buildPasswordField(
+                      passwordController, "Password", obscurePassword, () {
                     setState(() => obscurePassword = !obscurePassword);
                   }),
                   const SizedBox(height: 15),
@@ -125,8 +123,8 @@ class _UniversalRegisterPageState extends State<UniversalRegisterPage> {
                   // Confirm Password
                   _buildPasswordField(confirmPasswordController,
                       "Confirm Password", obscureConfirmPassword, () {
-                    setState(() =>
-                        obscureConfirmPassword = !obscureConfirmPassword);
+                    setState(
+                        () => obscureConfirmPassword = !obscureConfirmPassword);
                   }),
                   const SizedBox(height: 15),
 
@@ -163,8 +161,8 @@ class _UniversalRegisterPageState extends State<UniversalRegisterPage> {
                   const SizedBox(height: 15),
 
                   // Blood Group
-                  _buildTextField(
-                      bloodGroupController, "Blood Group", Icons.bloodtype, false),
+                  _buildTextField(bloodGroupController, "Blood Group",
+                      Icons.bloodtype, false),
                   const SizedBox(height: 15),
 
                   // City
@@ -257,8 +255,7 @@ class _UniversalRegisterPageState extends State<UniversalRegisterPage> {
       obscureText: obscure,
       validator: (value) {
         if (value!.isEmpty) return "Please enter $label";
-        if (label == "Confirm Password" &&
-            value != passwordController.text) {
+        if (label == "Confirm Password" && value != passwordController.text) {
           return "Passwords do not match";
         }
         if (value.length < 6) {
