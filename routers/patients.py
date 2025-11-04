@@ -16,7 +16,7 @@ router = APIRouter(
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 
-# ✅ Signup route
+# Signup route
 @router.post("/signup")
 def signup(user: SignupSchema, db: Session = Depends(get_db)):
     # Check if user already exists

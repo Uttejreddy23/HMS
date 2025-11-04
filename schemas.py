@@ -5,12 +5,12 @@ class SignupSchema(BaseModel):
     last_name: str| None=None
     e_mail: EmailStr
     password: str
-    conform_password: str
+    confirm_password: str
     gender: str | None = None
     age: int | None = Field(
         default=None, 
-        ge=12,        # greater than or equal to 0
-        le=100,      # less than or equal to 120
+        ge=12,        # greater than or equal to 12
+        le=100,      # less than or equal to 100
         description="Age must be between 12 to 100"
     )
     blood_group: str | None = None
@@ -24,7 +24,7 @@ class SignupSchema(BaseModel):
             raise ValueError("Only Gmail addresses are allowed")
         return v
 
-    @validator("conform_password")
+    @validator("confirm_password")
     def passwords_match(cls, v, values):
         if "password" in values and v != values["password"]:
             raise ValueError("Passwords do not match")
