@@ -42,6 +42,72 @@ class _PatientDashboardState extends State<PatientDashboard> {
         title: const Text("SmartKare - Patient Dashboard"),
         centerTitle: true,
       ),
+
+      // ✅ Drawer (side menu bar)
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF1976D2), Color(0xFF42A5F5)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Text(
+                "SmartKare Menu",
+                style: TextStyle(color: Colors.white, fontSize: 22),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.dashboard),
+              title: const Text("Dashboard"),
+              onTap: () {
+                setState(() => _selectedIndex = 0);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.calendar_today),
+              title: const Text("Appointments"),
+              onTap: () {
+                setState(() => _selectedIndex = 1);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.health_and_safety),
+              title: const Text("Reports"),
+              onTap: () {
+                setState(() => _selectedIndex = 2);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text("Profile"),
+              onTap: () {
+                setState(() => _selectedIndex = 3);
+                Navigator.pop(context);
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.settings, color: Colors.grey),
+              title: const Text("Settings"),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Settings page coming soon...")),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 400),
         child: _pages[_selectedIndex],
@@ -128,15 +194,13 @@ class _QuickActions extends StatelessWidget {
         "color": Colors.blueAccent,
         "onTap": () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const AppointmentPage()));
+              context, MaterialPageRoute(builder: (_) => const AppointmentPage()));
         }
       },
       {
         "icon": Icons.chat_bubble_outline,
         "title": "AI Symptom Checker",
-        "color": Colors.purpleAccent,
+        "color": Colors.purple,
         "onTap": () {}
       },
       {
@@ -148,45 +212,26 @@ class _QuickActions extends StatelessWidget {
       {
         "icon": Icons.support_agent_rounded,
         "title": "Contact Support",
-        "color": Colors.orangeAccent,
+        "color": Colors.orange,
         "onTap": () {}
       },
     ];
 
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
-      physics: const NeverScrollableScrollPhysics(),
-      children: actions.map((action) {
-        return InkWell(
-          onTap: action["onTap"] as VoidCallback,
-          borderRadius: BorderRadius.circular(15),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: (action["color"] as Color).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: action["color"] as Color, width: 1),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: actions.map((action) {
+          return Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: _HoverCard(
+              color: action["color"] as Color,
+              icon: action["icon"] as IconData,
+              title: action["title"] as String,
+              onTap: action["onTap"] as VoidCallback,
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(action["icon"] as IconData,
-                    color: action["color"] as Color, size: 40),
-                const SizedBox(height: 10),
-                Text(
-                  action["title"] as String,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 }
@@ -211,49 +256,125 @@ class _HealthOverview extends StatelessWidget {
         const Text("Health Overview",
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 16),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          children: stats.map((item) {
-            return Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.blueAccent.withOpacity(0.7),
-                    Colors.lightBlueAccent.withOpacity(0.7)
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: stats.map((item) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: _HoverCard(
+                  color: Colors.blueAccent,
+                  icon: item["icon"] as IconData,
+                  title: item["label"] as String,
+                  value: item["value"] as String,
+                  gradient: true,
                 ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(item["icon"] as IconData,
-                        size: 40, color: Colors.white),
-                    const SizedBox(height: 10),
-                    Text(item["value"] as String,
-                        style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white)),
-                    const SizedBox(height: 4),
-                    Text(item["label"] as String,
-                        style: const TextStyle(
-                            fontSize: 14, color: Colors.white70)),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
+              );
+            }).toList(),
+          ),
         ),
       ],
+    );
+  }
+}
+
+// ------------------ Hover Card Widget ---------------------
+
+class _HoverCard extends StatefulWidget {
+  final IconData icon;
+  final String title;
+  final Color color;
+  final VoidCallback? onTap;
+  final String? value;
+  final bool gradient;
+
+  const _HoverCard({
+    required this.icon,
+    required this.title,
+    required this.color,
+    this.onTap,
+    this.value,
+    this.gradient = false,
+  });
+
+  @override
+  State<_HoverCard> createState() => _HoverCardState();
+}
+
+class _HoverCardState extends State<_HoverCard> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedScale(
+        scale: _isHovered ? 1.08 : 1.0,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+        child: InkWell(
+          onTap: widget.onTap,
+          borderRadius: BorderRadius.circular(15),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            width: 160,
+            height: 150,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              border: widget.gradient
+                  ? null
+                  : Border.all(color: widget.color, width: 1),
+              gradient: widget.gradient
+                  ? LinearGradient(
+                      colors: [
+                        widget.color.withOpacity(0.8),
+                        widget.color.withOpacity(0.6)
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : null,
+              color:
+                  widget.gradient ? null : widget.color.withOpacity(0.15),
+              boxShadow: _isHovered
+                  ? [
+                      BoxShadow(
+                        color: widget.color.withOpacity(0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ]
+                  : [],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(widget.icon, size: 40, color: widget.gradient ? Colors.white : widget.color),
+                const SizedBox(height: 10),
+                if (widget.value != null)
+                  Text(
+                    widget.value!,
+                    style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                Text(
+                  widget.title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: widget.gradient
+                          ? Colors.white
+                          : Colors.black87),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
