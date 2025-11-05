@@ -104,6 +104,16 @@ class _PatientDashboardState extends State<PatientDashboard> {
                 );
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.redAccent),
+              title: const Text("Logout"),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Logged out successfully")),
+                );
+              },
+            ),
           ],
         ),
       ),
@@ -247,10 +257,30 @@ class _HealthOverview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stats = [
-      {"label": "Appointments", "value": "3", "icon": Icons.calendar_today},
-      {"label": "Reports", "value": "2", "icon": Icons.insert_drive_file},
-      {"label": "AI Checks", "value": "5", "icon": Icons.psychology},
-      {"label": "Health Score", "value": "92%", "icon": Icons.favorite},
+      {
+        "label": "Appointments",
+        "value": "3",
+        "icon": Icons.calendar_today,
+        "color": Colors.blueAccent
+      },
+      {
+        "label": "Reports",
+        "value": "2",
+        "icon": Icons.insert_drive_file,
+        "color": Colors.green
+      },
+      {
+        "label": "AI Checks",
+        "value": "5",
+        "icon": Icons.psychology,
+        "color": Colors.purple
+      },
+      {
+        "label": "Health Score",
+        "value": "92%",
+        "icon": Icons.favorite,
+        "color": Colors.redAccent
+      },
     ];
 
     return Column(
@@ -266,7 +296,7 @@ class _HealthOverview extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: _HoverCard(
-                  color: Colors.blueAccent,
+                  color: item["color"] as Color,
                   icon: item["icon"] as IconData,
                   title: item["label"] as String,
                   value: item["value"] as String,
@@ -321,8 +351,8 @@ class _HoverCardState extends State<_HoverCard> {
           borderRadius: BorderRadius.circular(15),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            width: 180, // Increased width
-            height: 180, // Increased height
+            width: 180,
+            height: 180,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
               border: widget.gradient
