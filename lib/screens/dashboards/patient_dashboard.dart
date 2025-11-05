@@ -104,14 +104,14 @@ class _PatientDashboardState extends State<PatientDashboard> {
                 );
               },
             ),
+
+            // ✅ Updated Logout
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.redAccent),
-              title: const Text("Logout"),
+              title: const Text("Logout", style: TextStyle(color: Colors.redAccent)),
               onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Logged out successfully")),
-                );
+                Navigator.pop(context); // Close drawer
+                Navigator.pop(context); // Go back to previous screen (logout)
               },
             ),
           ],
