@@ -2,8 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from database import get_db
-
-from database import get_db
 from models import PatientDetails
 from schemas import SignupSchema, LoginSchema
 
@@ -25,7 +23,7 @@ def signup(user: SignupSchema, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="User already exists")
 
     # Check password confirmation
-    if user.password != user.conform_password:
+    if user.password != user.confirm_password:
         raise HTTPException(status_code=400, detail="Passwords do not match")
 
     # Hash password
