@@ -31,16 +31,16 @@ class _AdminDashboardState extends State<AdminDashboard> {
       drawer: Drawer(
         child: Column(
           children: [
-            UserAccountsDrawerHeader(
-              decoration: const BoxDecoration(
+            const UserAccountsDrawerHeader(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Color(0xFF512DA8), Color(0xFF9575CD)],
                 ),
               ),
-              accountName: const Text("Super Admin",
+              accountName: Text("Super Admin",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              accountEmail: const Text("admin@smartkare.com"),
-              currentAccountPicture: const CircleAvatar(
+              accountEmail: Text("admin@smartkare.com"),
+              currentAccountPicture: CircleAvatar(
                 backgroundColor: Colors.white,
                 child: Icon(Icons.admin_panel_settings,
                     size: 40, color: Colors.deepPurpleAccent),

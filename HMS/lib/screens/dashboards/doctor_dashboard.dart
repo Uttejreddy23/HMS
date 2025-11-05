@@ -31,16 +31,16 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
       drawer: Drawer(
         child: Column(
           children: [
-            UserAccountsDrawerHeader(
-              decoration: const BoxDecoration(
+            const UserAccountsDrawerHeader(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Color(0xFF0D47A1), Color(0xFF42A5F5)],
                 ),
               ),
-              accountName: const Text("Dr. Emily Watson",
+              accountName: Text("Dr. Emily Watson",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              accountEmail: const Text("dr.emily@smartkare.com"),
-              currentAccountPicture: const CircleAvatar(
+              accountEmail: Text("dr.emily@smartkare.com"),
+              currentAccountPicture: CircleAvatar(
                 backgroundColor: Colors.white,
                 child: Icon(Icons.medical_services,
                     size: 40, color: Colors.blueAccent),

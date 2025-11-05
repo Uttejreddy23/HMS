@@ -958,7 +958,6 @@ class _ContactFooterSection extends StatelessWidget {
     );
   }
 }
-
 // ----------------------------- UTIL -----------------------------
 class SectionTitle extends StatelessWidget {
   final String title;
