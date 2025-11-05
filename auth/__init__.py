@@ -3,11 +3,9 @@ from jose import JWTError, jwt
 from fastapi import HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 
-
-SECRET_KEY = 'f9bf78b9a18ce6d46a0cd2b0b86df9da'
+SECRET_KEY = "SUPER_SECRET_KEY_CHANGE_THIS"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
-
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="patients/signin")
 

@@ -1,12 +1,11 @@
-from fastapi import FastAPI
-from database import Base, engine
-from routers import patients
+from fastapi import FastAPI , Depends
+from schemas import SignupSchema , LoginSchema
+app = FastAPI()
+from database import Base, engine, get_db,SessionLocal
+from models import PatientDetails  # or wherever your model is
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="SMARTKARE")
-app.include_router(patients.router)
+from routers.patients import router as patient_router
 
-@app.get("/")
-def root():
-    return {"message": "Patient API running"}
+app.include_router(patient_router)
