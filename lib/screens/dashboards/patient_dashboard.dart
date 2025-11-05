@@ -217,17 +217,20 @@ class _QuickActions extends StatelessWidget {
       },
     ];
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: actions.map((action) {
-          return Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: _HoverCard(
-              color: action["color"] as Color,
-              icon: action["icon"] as IconData,
-              title: action["title"] as String,
-              onTap: action["onTap"] as VoidCallback,
+          return Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: _HoverCard(
+                color: action["color"] as Color,
+                icon: action["icon"] as IconData,
+                title: action["title"] as String,
+                onTap: action["onTap"] as VoidCallback,
+              ),
             ),
           );
         }).toList(),
@@ -256,12 +259,12 @@ class _HealthOverview extends StatelessWidget {
         const Text("Health Overview",
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 16),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: stats.map((item) {
-              return Padding(
-                padding: const EdgeInsets.only(right: 16.0),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: stats.map((item) {
+            return Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: _HoverCard(
                   color: Colors.blueAccent,
                   icon: item["icon"] as IconData,
@@ -269,9 +272,9 @@ class _HealthOverview extends StatelessWidget {
                   value: item["value"] as String,
                   gradient: true,
                 ),
-              );
-            }).toList(),
-          ),
+              ),
+            );
+          }).toList(),
         ),
       ],
     );
@@ -318,8 +321,8 @@ class _HoverCardState extends State<_HoverCard> {
           borderRadius: BorderRadius.circular(15),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            width: 160,
-            height: 150,
+            width: 180, // Increased width
+            height: 180, // Increased height
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
               border: widget.gradient
@@ -335,8 +338,7 @@ class _HoverCardState extends State<_HoverCard> {
                       end: Alignment.bottomRight,
                     )
                   : null,
-              color:
-                  widget.gradient ? null : widget.color.withOpacity(0.15),
+              color: widget.gradient ? null : widget.color.withOpacity(0.15),
               boxShadow: _isHovered
                   ? [
                       BoxShadow(
@@ -350,13 +352,16 @@ class _HoverCardState extends State<_HoverCard> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(widget.icon, size: 40, color: widget.gradient ? Colors.white : widget.color),
-                const SizedBox(height: 10),
+                Icon(widget.icon,
+                    size: 45,
+                    color:
+                        widget.gradient ? Colors.white : widget.color),
+                const SizedBox(height: 12),
                 if (widget.value != null)
                   Text(
                     widget.value!,
                     style: const TextStyle(
-                        fontSize: 22,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.white),
                   ),
@@ -365,10 +370,9 @@ class _HoverCardState extends State<_HoverCard> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                      color: widget.gradient
-                          ? Colors.white
-                          : Colors.black87),
+                      fontSize: 15,
+                      color:
+                          widget.gradient ? Colors.white : Colors.black87),
                 ),
               ],
             ),
