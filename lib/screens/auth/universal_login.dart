@@ -43,7 +43,6 @@ class _UniversalLoginPageState extends State<UniversalLoginPage> {
       return;
     }
 
-    // TODO: Real API login later
     setState(() {
       showError = false;
     });
@@ -72,7 +71,11 @@ class _UniversalLoginPageState extends State<UniversalLoginPage> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFB3E5FC), Color(0xFF81D4FA)],
+            colors: [
+              Color(0xFFCAF0F8),
+              Color(0xFF90E0EF),
+              Color(0xFF0077B6),
+            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -102,7 +105,7 @@ class _UniversalLoginPageState extends State<UniversalLoginPage> {
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blueAccent,
+                      color: Color(0xFF0077B6),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -116,11 +119,10 @@ class _UniversalLoginPageState extends State<UniversalLoginPage> {
 
                   const SizedBox(height: 20),
 
-                  // 🔥 Error Box (GreytHR style)
                   if (showError)
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 12),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                       margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
                         color: Colors.red.shade50,
@@ -155,8 +157,7 @@ class _UniversalLoginPageState extends State<UniversalLoginPage> {
                       ),
                     ),
                     items: const [
-                      DropdownMenuItem(
-                          value: 'Patient', child: Text('Patient')),
+                      DropdownMenuItem(value: 'Patient', child: Text('Patient')),
                       DropdownMenuItem(value: 'Doctor', child: Text('Doctor')),
                       DropdownMenuItem(value: 'Admin', child: Text('Admin')),
                     ],
@@ -196,7 +197,7 @@ class _UniversalLoginPageState extends State<UniversalLoginPage> {
                   ElevatedButton(
                     onPressed: handleLogin,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
+                      backgroundColor: const Color(0xFF0077B6),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -225,7 +226,7 @@ class _UniversalLoginPageState extends State<UniversalLoginPage> {
                         child: const Text(
                           "Register Now",
                           style: TextStyle(
-                            color: Colors.blueAccent,
+                            color: Color(0xFF0077B6),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -241,4 +242,3 @@ class _UniversalLoginPageState extends State<UniversalLoginPage> {
     );
   }
 }
-// Karishma
