@@ -15,6 +15,7 @@ class _UniversalRegisterPageState extends State<UniversalRegisterPage> {
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
   final emailController = TextEditingController();
+  final phoneController = TextEditingController(); // ✅ Added Phone Controller
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   final genderController = TextEditingController();
@@ -111,6 +112,23 @@ class _UniversalRegisterPageState extends State<UniversalRegisterPage> {
                     if (!value.contains("@")) return "Invalid email format";
                     return null;
                   }),
+                  const SizedBox(height: 15),
+
+                  // ✅ Phone Number
+                  _buildTextField(
+                    phoneController,
+                    "Phone Number",
+                    Icons.phone,
+                    false,
+                    keyboardType: TextInputType.phone,
+                    validator: (value) {
+                      if (value!.isEmpty) return "Please enter phone number";
+                      if (value.length < 10) {
+                        return "Enter valid phone number (10 digits)";
+                      }
+                      return null;
+                    },
+                  ),
                   const SizedBox(height: 15),
 
                   // Password

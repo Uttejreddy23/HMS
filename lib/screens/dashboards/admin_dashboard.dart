@@ -142,6 +142,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             title: const Text("Logout", style: TextStyle(color: Colors.redAccent)),
             onTap: () {
               Navigator.pop(context);
+              Navigator.pop(context);
             },
           ),
         ],
